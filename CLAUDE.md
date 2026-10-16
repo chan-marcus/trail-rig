@@ -11,6 +11,7 @@ Off-road overlanding browser game for the Venture the Terrain brand. A truck "vi
 
 - Expedition outcomes come from a pure, seeded function: `resolve(rig, ups, start, route, seed)` returns a trail report. Keep it pure and deterministic.
 - Balance testing: open the page and run `simulate(3000)` in the browser console to print finish rates and bolts for every rig, terrain and difficulty.
+- Trail lengths and real-time durations (`LEN`): tutorial 1 min, short 2.5 min, day trip 30 min, long haul 2 h.
 - 3 rigs (Scout, Hauler, Brute), 8 upgrades with 4 slots, 3 terrains (desert, mud, rock), 15 events (5 per terrain), and stranding. Bolts are the only currency. Players always see "bolts" (use `bolts(n)` for amounts so 1 reads "1 bolt"); the code and save data still call it `salvage`, so leave those keys alone.
 - Map: the 15 named trails (`NAMES`) sit on a fog-of-war map (`mapSVG`, positions in `MAPPT`). The first run on a trail pays a discovery bonus (`DISC`, 20 to 40 bolts by difficulty), and mapping all 5 trails in a region pays `REGION_BONUS` (100) once. Both are paid in `readReport` via `discover()`, outside `resolve`, so outcomes stay pure. Map progress saves under `st.map` (`seen`, `regions`). `genRoutes` leans 70% toward trails you have not found yet, and the board tags undiscovered trails with their bonus.
 - Rig level and XP are derived from career stats (`xpOf`, `levelOf`). Level is a readout, not a power gate.

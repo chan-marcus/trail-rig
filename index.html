@@ -395,10 +395,10 @@ const UPS={
  skids:{name:'Skid plates',cost:70,w:2,good:'halves rock damage',bad:'heavy',mod:s=>{s.skids=true}}
 };
 const LEN={
- tut:{label:'Tutorial',miles:8,dur:2*MIN,events:4},
- short:{label:'Short',miles:12,dur:5*MIN,events:5},
- day:{label:'Day trip',miles:30,dur:HR,events:7},
- long:{label:'Long haul',miles:60,dur:4*HR,events:9}
+ tut:{label:'Tutorial',miles:8,dur:1*MIN,events:4},
+ short:{label:'Short',miles:12,dur:2.5*MIN,events:5},
+ day:{label:'Day trip',miles:30,dur:30*MIN,events:7},
+ long:{label:'Long haul',miles:60,dur:2*HR,events:9}
 };
 const NAMES={
  desert:['Dry Lake Two-Track','Borrego Wash','Sidewinder Flats','Mesquite Spur','Ghost Mine Road'],
@@ -690,7 +690,7 @@ function nextAction(){
   if(st.salvage>0)return{l:'Refuel',s:`${bolts(Math.min(fuelCost(),st.salvage))} to fill up`,fn:refuel,pulse:1};
   if(now<st.canAt)return{l:'Spare can is empty',s:`Refills in ${fmt(st.canAt-now)}`,off:1};
   return{l:'Grab the spare can',s:'+25 fuel, free',fn:spareCan,pulse:1}}
- if(st.runs===0)return{l:'Send it',s:'Fire road shakedown, 2 min',fn:()=>depart(0),pulse:1};
+ if(st.runs===0)return{l:'Send it',s:'Fire road shakedown, 1 min',fn:()=>depart(0),pulse:1};
  return{l:'Pick a trail',s:'Three trails on the board',fn:()=>{setTab('routes');$('board').scrollIntoView({behavior:RMQ.matches?'auto':'smooth',block:'start'})}};
 }
 
