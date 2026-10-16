@@ -114,6 +114,28 @@ button{background:none;border:0;cursor:pointer}
 .gear li{border:1px solid var(--line);background:var(--s2);border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gear li.empty{border-style:dashed;background:transparent;color:var(--fa);font-weight:500}
 
+.righead{margin-bottom:18px}
+@media (min-width:600px){
+ .righead{display:grid;grid-template-columns:minmax(0,1fr);gap:18px 28px;align-items:center}
+ .righead .gauges{margin-top:0;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 16px}
+ .righead .gauge{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l v" "t t";gap:5px 6px;font-size:12px}
+ .righead .gauge>span:first-child{grid-area:l;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .righead .gauge .v{grid-area:v}
+ .righead .gauge .track{grid-area:t;height:6px}
+ .righead .gearwrap{grid-column:1/-1;margin-top:0;display:flex;align-items:center;gap:16px;padding-top:16px;border-top:1px solid var(--line)}
+ .righead .gearwrap .label{margin:0;flex:none;gap:8px;justify-content:flex-start}
+ .righead .gear{flex:1;min-width:0;grid-template-columns:repeat(4,minmax(0,1fr))}
+ .righead .gear li{padding:6px 10px}
+}
+@media (min-width:900px){.righead{grid-template-columns:minmax(220px,1fr) minmax(0,2.4fr)}}
+@media (max-width:599px){
+ .righead .xp{margin-top:10px}
+ .righead .gauges{gap:6px;margin-top:14px}
+ .righead .gauge{font-size:12px}
+ .righead .gearwrap{margin-top:14px}
+ .righead .gear{gap:6px}
+ .righead .gear li{padding:5px 10px;font-size:12px}
+}
 /* trail board */
 .tabs{grid-template-columns:repeat(4,1fr)!important}
 .tabs,.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
@@ -205,11 +227,18 @@ button{background:none;border:0;cursor:pointer}
 .career{margin-top:20px}
 .career p{font-size:14px;color:var(--mu);padding:2px 0}
 .career .gold{color:var(--ac)}
-.pick{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:center;width:100%;text-align:left;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;transition:border-color .15s}
+.pick{display:grid;grid-template-columns:136px minmax(0,1fr) auto;column-gap:16px;align-items:center;width:100%;text-align:left;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;transition:border-color .15s}
 .pick:hover{border-color:var(--ac)}
 .pick b{font-size:16px;font-weight:700}
 .pick .btn{pointer-events:none}
-.pick span:not(.btn){grid-column:1/-1;font-size:13px;color:var(--mu)}
+.pick .pv{display:block;width:100%;aspect-ratio:96/56;image-rendering:pixelated;border-radius:8px;background:linear-gradient(180deg,#B7C0C2 0%,#D8D4CA 44%,#E2D2B4 62%,#CDB995 100%)}
+.pick .pt{min-width:0}
+.pick .pt>span{display:block;font-size:13px;color:var(--mu)}
+.pick b{display:block;margin-bottom:2px}
+@media (max-width:599px){
+ .pick{grid-template-columns:96px minmax(0,1fr);column-gap:12px;padding:10px 12px}
+ .pick .btn{grid-column:2;justify-self:start;margin-top:8px}
+}
 .pick .s{color:var(--fa)}
 
 /* title screen, shown until a rig is picked */
@@ -278,6 +307,21 @@ button{background:none;border:0;cursor:pointer}
     <h1 class="brand"><b>TRAIL RIG</b><small>Venture the Terrain</small></h1>
     <div class="hud"><span class="salv"><b id="salv">0</b>bolts</span><button class="btn icon" id="mute" aria-label="Mute sound"></button></div>
   </header>
+  <section class="card righead" id="rig" aria-label="Rig">
+    <div class="who">
+    <div class="ident"><input id="name" class="name" maxlength="16" spellcheck="false" autocomplete="off" aria-label="Rig name"><span class="lvchip" id="lvChip">LV 1</span></div>
+    <p id="rigSub"></p>
+    <div class="xp"><span class="track" id="b-xp"><i></i></span><span class="num" id="v-xp"></span></div>
+    </div>
+    <div class="gauges">
+      <div class="gauge" id="g-fuel"><span>Fuel</span><span class="track"><i></i></span><span class="v"></span></div>
+      <div class="gauge" id="g-engine"><span>Engine</span><span class="track"><i></i></span><span class="v"></span></div>
+      <div class="gauge" id="g-susp"><span>Suspension</span><span class="track"><i></i></span><span class="v"></span></div>
+      <div class="gauge" id="g-tires"><span>Tires</span><span class="track"><i></i></span><span class="v"></span></div>
+      <div class="gauge" id="g-stoke"><span>Stoke</span><span class="track"><i></i></span><span class="v"></span></div>
+    </div>
+    <div class="gearwrap"><h3 class="label"><span>Gear</span><span id="gearCount"></span></h3><ul class="gear" id="gear"></ul></div>
+  </section>
   <div class="layout">
     <div class="col">
       <section class="card" id="camp">
@@ -292,20 +336,6 @@ button{background:none;border:0;cursor:pointer}
           </div>
         </div>
         <div class="journal"><h3 class="label">Journal</h3><ol id="journal"></ol></div>
-      </section>
-      <section class="card" id="rig">
-        <h2 class="label">Rig</h2>
-        <div class="ident"><input id="name" class="name" maxlength="16" spellcheck="false" autocomplete="off" aria-label="Rig name"><span class="lvchip" id="lvChip">LV 1</span></div>
-        <p id="rigSub"></p>
-        <div class="xp"><span class="track" id="b-xp"><i></i></span><span class="num" id="v-xp"></span></div>
-        <div class="gauges">
-          <div class="gauge" id="g-fuel"><span>Fuel</span><span class="track"><i></i></span><span class="v"></span></div>
-          <div class="gauge" id="g-engine"><span>Engine</span><span class="track"><i></i></span><span class="v"></span></div>
-          <div class="gauge" id="g-susp"><span>Suspension</span><span class="track"><i></i></span><span class="v"></span></div>
-          <div class="gauge" id="g-tires"><span>Tires</span><span class="track"><i></i></span><span class="v"></span></div>
-          <div class="gauge" id="g-stoke"><span>Stoke</span><span class="track"><i></i></span><span class="v"></span></div>
-        </div>
-        <div class="gearwrap"><h3 class="label"><span>Gear</span><span id="gearCount"></span></h3><ul class="gear" id="gear"></ul></div>
       </section>
     </div>
     <section class="card board" id="board">
@@ -859,7 +889,7 @@ $('name').value=st.name;$('name').oninput=e=>{st.name=e.target.value.slice(0,16)
 $('mute').onclick=()=>{st.mute=!st.mute;save();render();if(!st.mute){ensureAC();horn(1,.15)}};
 $('rev').onclick=rev;$('wash').onclick=wash;
 $('c').addEventListener('pointerdown',()=>{if(st.mud>=5)wash();else rev()});
-$('pickList').innerHTML=Object.entries(RIGS).map(([id,r])=>`<li><button class="pick" data-rig="${id}"><b>${r.name}</b><span class="btn sm go">Choose</span><span>${r.desc}</span><span class="s">Grip ${r.cap} · Toughness ${r.rel} · Range ${r.range}</span></button></li>`).join('');
+$('pickList').innerHTML=Object.entries(RIGS).map(([id,r])=>`<li><button class="pick" data-rig="${id}"><canvas class="pv" width="96" height="56" data-pv="${id}" aria-hidden="true"></canvas><span class="pt"><b>${r.name}</b>${sentences(r.desc)}<span class="s">Grip ${r.cap} · Tough ${r.rel} · Range ${r.range}</span></span><span class="btn sm go">Choose</span></button></li>`).join('');
 document.querySelectorAll('[data-rig]').forEach(b=>b.onclick=()=>pickRig(b.dataset.rig));
 function startGame(){ensureAC();vroom(1.5);$('start').hidden=true;openOv('picker')}
 $('startBtn').onclick=startGame;
@@ -940,7 +970,7 @@ function render(full){
 }
 
 /* ---------- pixel truck: the rig as a calm little pet ---------- */
-const cv=$('c'),ctx=cv.getContext('2d'),G=50;
+const cv=$('c'),G=50;let ctx=cv.getContext('2d');
 const C=['#F3EBDD','#A39A86','#6E6355','#2A2622'];
 let parts=[],revAt=0;
 function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}
@@ -1002,6 +1032,12 @@ function drawParts(){parts=parts.filter(p=>p.life-->0);parts.forEach(p=>{p.x+=p.
 function loop(t){drawScene(t);requestAnimationFrame(loop)}
 
 /* ---------- boot ---------- */
+/* still portraits of each stock rig for the picker, drawn with the same sprite code */
+function portraits(){document.querySelectorAll('[data-pv]').forEach(c=>{
+ const keep={ctx,rig:st.rig,ups:st.ups,mud:st.mud,trip:st.trip,str:st.stranded,pen:st.pending,stoke:st.stoke,eng:st.p.engine,parts,reduce};
+ try{ctx=c.getContext('2d');st.rig=c.dataset.pv;st.ups=[];st.mud=0;st.trip=null;st.stranded=null;st.pending=null;st.stoke=60;st.p.engine=100;parts=[];reduce=true;drawScene(0)}
+ finally{ctx=keep.ctx;st.rig=keep.rig;st.ups=keep.ups;st.mud=keep.mud;st.trip=keep.trip;st.stranded=keep.str;st.pending=keep.pen;st.stoke=keep.stoke;st.p.engine=keep.eng;parts=keep.parts;reduce=keep.reduce}})}
+portraits();
 tick();save();render(true);requestAnimationFrame(loop);
 let lastSig='';
 setInterval(()=>{
