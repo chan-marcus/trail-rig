@@ -41,4 +41,4 @@ Off-road overlanding browser game for the Venture the Terrain brand. A truck "vi
 
 ## Deploy notes
 
-- Pushing to `main` should auto-deploy. As of the "Add favicon and brighter mileage pop-ups" commit, Cloudflare did not pick up the push automatically (the GitHub app has access to all repositories, so the webhook is the suspect). If a push does not appear on the live site within a few minutes, trigger a deploy from the Cloudflare dashboard or add a deploy hook.
+- Pushing to `main` auto-deploys to https://trail-rig.pages.dev, usually within 30 seconds (working reliably since 2026-10-15). Commit and push finished, verified changes to `main` without asking. Afterwards, check that the live page serves the new version.
