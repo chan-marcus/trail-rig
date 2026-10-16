@@ -151,7 +151,7 @@ button{background:none;border:0;cursor:pointer}
  .righead .gear li{padding:5px 10px;font-size:12px}
 }
 /* trail board */
-.tabs{grid-template-columns:repeat(4,1fr)!important}
+.tabs{grid-template-columns:repeat(3,1fr)!important}
 .tabs,.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
 .tabs{margin-bottom:20px}
 .tabs button,.seg button{border-radius:9px;padding:7px 0;font-size:14px;font-weight:600;color:var(--mu);white-space:nowrap}
@@ -371,6 +371,34 @@ button{background:none;border:0;cursor:pointer}
  .tabs button{padding:6px 0}
  .grid2,.grid3{gap:5px}
 }
+.mapcap{font-size:12px;color:var(--mu);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mapBox .mk{cursor:pointer}
+.map svg{overflow:visible}
+.map{overflow:hidden}
+#mapBox .dest{transform-box:fill-box;transform-origin:center;animation:destp 1.6s ease-out infinite}
+@keyframes destp{0%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(1.5)}}
+#tripTruck{transition:transform 1s linear}
+@media (prefers-reduced-motion:reduce){#mapBox .dest{animation:none}#tripTruck{transition:none}}
+.col{display:flex;flex-direction:column;gap:18px}
+@media (max-width:899px){#camp{order:-1}}
+@media (min-width:900px) and (min-height:620px){
+ #mapcard{flex:1 1 0;min-height:150px;display:flex;flex-direction:column}
+ #mapcard .map{flex:1;min-height:0;display:flex}
+ #mapcard .map svg{height:100%!important;width:100%}
+ #camp{flex:none;height:auto!important}
+ #camp .campgrid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:14px;align-items:center}
+ #camp .screen{margin-bottom:0}
+ #camp .screen canvas{height:auto!important;width:100%!important}
+ #camp .journal{flex:none;max-height:92px;margin-top:10px;padding-top:10px}
+ #camp>.label{display:none}
+ #camp .primary{margin-top:8px;padding:8px 14px}
+ #camp .radio{margin-top:8px;padding:6px 8px 6px 12px}
+ #camp .pet{margin-top:8px}
+ #camp .status p:first-child{font-size:15px}
+ #mapcard>.label{margin-bottom:8px}
+ #mapcard .mapcap{margin-top:6px}
+ .col{gap:12px}
+}
 /* map tab */
 .map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
 .map svg{display:block;width:100%;height:auto}
@@ -424,7 +452,7 @@ button{background:none;border:0;cursor:pointer}
   <section class="card righead" id="rig" aria-label="Rig">
     <div class="who">
       <div class="whotop">
-        <div class="lvbadge" id="lvBadge" aria-label="Rig level"><small>LV</small><b id="lvNum">1</b></div>
+        <div class="lvbadge" id="lvBadge" aria-label="Rig level"><small>LVL</small><b id="lvNum">1</b></div>
         <div class="whot"><div class="ident"><input id="name" class="name" maxlength="16" spellcheck="false" autocomplete="off" aria-label="Rig name"></div><p id="rigSub"></p></div>
       </div>
       <div class="xp"><span class="track" id="b-xp"><i></i></span><span class="num" id="v-xp"></span></div>
@@ -440,6 +468,11 @@ button{background:none;border:0;cursor:pointer}
   </section>
   <div class="layout">
     <div class="col">
+      <section class="card" id="mapcard">
+        <h2 class="label"><span>Map</span><span id="mapCount"></span></h2>
+        <div class="map" id="mapBox"></div>
+        <p class="mapcap" id="mapCap"></p>
+      </section>
       <section class="card" id="camp">
         <h2 class="label">Camp</h2>
         <div class="campgrid">
@@ -457,7 +490,6 @@ button{background:none;border:0;cursor:pointer}
     <section class="card board" id="board">
       <div class="tabs" role="tablist">
         <button role="tab" aria-selected="true" data-tab="routes">Trails</button>
-        <button role="tab" aria-selected="false" data-tab="map">Map</button>
         <button role="tab" aria-selected="false" data-tab="garage">Workshop</button>
         <button role="tab" aria-selected="false" data-tab="stats">Ledger<span class="new" id="statDot" hidden></span></button>
       </div>
@@ -848,7 +880,7 @@ function scrap(S,box,v){
 }
 /* ---------- map ---------- */
 const DISC=d=>10+d*10,REGION_BONUS=100;
-/* each level reached pays bolts: LV 2 = 50, LV 3 = 75, ... */
+/* each level reached pays bolts: LVL 2 = 50, LVL 3 = 75, ... */
 const LVREWARD=l=>25*l;
 if(st.lvPaid===undefined)st.lvPaid=levelOf(xpOf(st.car)).lvl;
 const REG={desert:'Desert',mud:'Mud country',rock:'Rock country'};
@@ -864,25 +896,44 @@ function discover(rt){
   out.lines.push([`${REG[rt.terrain]} is fully mapped.`,'gold',REGION_BONUS,1]);out.notes.push([`${REG[rt.terrain]} fully mapped.`,REGION_BONUS])}
  return out;
 }
+/* where a trip goes on the map: a named trail's marker, or a short loop near camp for the fire road */
+function tripDest(rt,P){for(const q of Object.values(P))if(q.n===rt.name)return[q.x,q.y];return[196,176]}
+function renderMap(){
+ const found=Object.keys(MAPPT).reduce((a,t)=>a+NAMES[t].filter(n=>st.map.seen[n]).length,0);
+ $('mapCount').textContent=`${found} of 15 found`;
+ $('mapBox').innerHTML=mapSVG();
+ $('mapBox').querySelectorAll('.mk').forEach(m=>m.onclick=()=>{mapCap(m.dataset.n?`${m.dataset.n}: on your map.`:'Unexplored trail. Run it to clear the fog.')});
+ mapCap();moveTruck();
+}
+function mapCap(t){if(!t){const r=Object.keys(MAPPT).map(k=>`${REG[k]} ${NAMES[k].filter(n=>st.map.seen[n]).length}/5`).join(' · ');t=st.trip?`${nm()} is heading to ${st.trip.route.name}.`:`${r}. New trails pay a bonus.`}$('mapCap').textContent=t}
+function moveTruck(){const p=$('tripPath'),tk=$('tripTruck');if(!p||!tk)return;
+ const k=st.trip?clamp((Date.now()-st.trip.start)/(st.trip.end-st.trip.start)*100)/100:1,L=p.getTotalLength(),pt=p.getPointAtLength(L*(isFinite(k)?k:0));
+ tk.removeAttribute('transform');tk.style.transform=`translate(${pt.x.toFixed(1)}px,${pt.y.toFixed(1)}px)`}
 function mapSVG(){
  const camp=[160,194],posted=new Set((st.routes||[]).map(r=>r.name)),P={};
  for(const t in MAPPT)NAMES[t].forEach((n,i)=>{P[t+i]={n,x:MAPPT[t][i][0],y:MAPPT[t][i][1],s:!!st.map.seen[n],p:posted.has(n)}});
- let g=`<rect x="0" y="0" width="110" height="210" fill="#3A3122"/><rect x="110" y="0" width="100" height="210" fill="#283021"/><rect x="210" y="0" width="110" height="210" fill="#33302B"/>`;
+ let g=`<rect x="-400" y="-200" width="510" height="610" fill="#3A3122"/><rect x="110" y="-200" width="100" height="610" fill="#283021"/><rect x="210" y="-200" width="510" height="610" fill="#33302B"/>`;
  for(const[x,y]of[[18,80],[62,68],[28,124],[84,130],[70,176],[18,190],[96,16]])g+=`<path d="M${x-14} ${y}q14 -9 28 0" stroke="#7A6440" stroke-width="2" fill="none"/>`;
  for(const[x,y]of[[120,74],[148,64],[172,72],[204,80],[120,116],[178,146],[204,160],[150,128],[188,96],[200,40]])g+=`<path d="M${x} ${y-9}l6 11h-12z" fill="#56633A"/>`;
  for(const[x,y,w]of[[226,78,18],[264,80,20],[306,96,14],[226,128,15],[278,154,18],[306,176,12],[288,116,13]])g+=`<path d="M${x-w} ${y}L${x} ${y-w*1.1}L${x+w} ${y}Z" fill="#5E5850"/><path d="M${x-w*.32} ${y-w*.75}L${x} ${y-w*1.1}L${x+w*.32} ${y-w*.75}Z" fill="#8F877C"/>`;
  let roads='';for(const t in ROADS){let prev=camp;ROADS[t].forEach(i=>{const q=P[t+i];roads+=`<path d="M${prev[0]} ${prev[1]}Q${(prev[0]+q.x)/2+8} ${(prev[1]+q.y)/2-6} ${q.x} ${q.y}"/>`;prev=[q.x,q.y]})}
  g+=`<g stroke="#C9A86A" stroke-width="1.6" stroke-dasharray="3 4" fill="none" opacity=".75">${roads}</g>`;
  const holes=Object.values(P).filter(q=>q.s).map(q=>`<circle cx="${q.x}" cy="${q.y}" r="30"/>`).join('');
- g+=`<defs><filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter><mask id="fogm"><rect width="320" height="210" fill="#fff"/><g fill="#000" filter="url(#soft)"><circle cx="${camp[0]}" cy="${camp[1]}" r="34"/>${holes}</g></mask></defs>`;
- g+=`<rect width="320" height="210" fill="#141210" opacity=".88" mask="url(#fogm)"/>`;
+ g+=`<defs><filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter><mask id="fogm" maskUnits="userSpaceOnUse" x="-400" y="-200" width="1120" height="610"><rect x="-400" y="-200" width="1120" height="610" fill="#fff"/><g fill="#000" filter="url(#soft)"><circle cx="${camp[0]}" cy="${camp[1]}" r="34"/>${holes}</g></mask></defs>`;
+ g+=`<rect x="-400" y="-200" width="1120" height="610" fill="#141210" opacity=".88" mask="url(#fogm)"/>`;
  g+=`<g font-family="Inter,sans-serif" font-size="8" font-weight="700" letter-spacing="1.5" fill="#A69D90"><text x="10" y="200">DESERT</text><text x="118" y="14">MUD</text><text x="276" y="200">ROCK</text></g>`;
  g+=`<path d="M151 200L160 184L169 200Z" fill="#E3A63E"/><path d="M158 200L160 194L162 200Z" fill="#1C1916"/>`;
  for(const q of Object.values(P)){
   if(q.p)g+=`<circle cx="${q.x}" cy="${q.y}" r="10" fill="none" stroke="#E3A63E" stroke-width="1.5" stroke-dasharray="2 2.5" class="ping"/>`;
-  g+=q.s?`<g><title>${esc(q.n)}</title><circle cx="${q.x}" cy="${q.y}" r="5.5" fill="#E3A63E" stroke="#1C1916" stroke-width="2"/></g>`
-   :`<g><title>Unexplored trail</title><circle cx="${q.x}" cy="${q.y}" r="6" fill="#24201C" stroke="#6E665A" stroke-width="1.2"/><text x="${q.x}" y="${q.y+3}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="800" fill="#998F82">?</text></g>`;
+  g+=q.s?`<g class="mk" data-n="${esc(q.n)}"><title>${esc(q.n)}</title><circle cx="${q.x}" cy="${q.y}" r="5.5" fill="#E3A63E" stroke="#1C1916" stroke-width="2"/></g>`
+   :`<g class="mk" data-n=""><title>Unexplored trail</title><circle cx="${q.x}" cy="${q.y}" r="6" fill="#24201C" stroke="#6E665A" stroke-width="1.2"/><text x="${q.x}" y="${q.y+3}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="800" fill="#998F82">?</text></g>`;
  }
+ const tr=st.trip||st.pending||null;
+ if(tr){const d=tripDest(tr.route,P),c=camp,mx=(c[0]+d[0])/2+(d[0]<c[0]?-14:14),my=(c[1]+d[1])/2-10;
+  g+=`<path id="tripPath" d="M${c[0]} ${c[1]-4}Q${mx} ${my} ${d[0]} ${d[1]}" stroke="#E3A63E" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 5" fill="none" opacity=".95"/>`;
+  g+=`<circle cx="${d[0]}" cy="${d[1]}" r="11" fill="none" stroke="#E3A63E" stroke-width="2" class="dest"/>`;
+  g+=`<g id="tripTruck" transform="translate(${c[0]} ${c[1]-4})"><g id="tripFlip" transform="scale(${d[0]<c[0]?-1:1} 1)" filter="url(#glow)"><rect x="-8" y="-9" width="16" height="6" rx="1.5" fill="#E3A63E" stroke="#1C1916" stroke-width="1.2"/><rect x="1" y="-13" width="6" height="5" rx="1" fill="#E3A63E" stroke="#1C1916" stroke-width="1.2"/><circle cx="-4.5" cy="-2.5" r="2.6" fill="#1C1916"/><circle cx="4.5" cy="-2.5" r="2.6" fill="#1C1916"/></g></g>`;
+  g+=`<defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="0" stdDeviation="2.2" flood-color="#E3A63E" flood-opacity=".8"/></filter></defs>`}
  return`<svg viewBox="0 0 320 210" role="img" aria-label="Trail map, ${Object.values(P).filter(q=>q.s).length} of 15 trails found">${g}</svg>`;
 }
 
@@ -1031,14 +1082,6 @@ function renderPanel(){
   P.innerHTML=h;
   P.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>depart(+b.dataset.go));
   if($('turn'))$('turn').onclick=turnBack;
- }else if(tab==='map'){
-  const found=Object.keys(MAPPT).reduce((a,t)=>a+NAMES[t].filter(n=>st.map.seen[n]).length,0);
-  let h=sect('Map',`${found} of 15 found`)+`<div class="map">${mapSVG()}</div><p class="maphint">First run on a trail pays a discovery bonus. A whole region pays +${bolts(REGION_BONUS)}.</p>`;
-  h+='<ol class="grid3">'+Object.keys(MAPPT).map(t=>{const got=NAMES[t].filter(n=>st.map.seen[n]),done=!!st.map.regions[t];
-   return`<li class="tile region"><div class="th"><h3>${REG[t]}</h3><span class="num">${got.length}/5</span></div><span class="track"><i style="width:${got.length*20}%"></i></span>
-   ${got.map(n=>`<p>${esc(n)}</p>`).join('')}${got.length<5?`<p class="con">${5-got.length} still in the fog</p>`:''}
-   <p class="rw ${done?'gold':''}">${done?`Mapped, +${bolts(REGION_BONUS)} claimed`:`Map all 5: +${bolts(REGION_BONUS)}`}</p></li>`}).join('')+'</ol>';
-  P.innerHTML=h;
  }else if(tab==='stats'){
   const c=st.car;
   let h=sect('Milestones')+'<ol class="grid2">'+CARDS.map(([k,l])=>{const v=c[k],from=st.seen[k]??v,t=tierOf(k,v),d=v-from;
@@ -1077,7 +1120,7 @@ function render(full){
  $('lvNum').textContent=L.lvl;$('lvBadge').setAttribute('aria-label',`Rig level ${L.lvl}`);
  if(render.lv!==undefined&&L.lvl>render.lv){const bd=$('lvBadge');bd.classList.remove('up');void bd.offsetWidth;bd.classList.add('up');sparks(bd,24);horn(2,.16)}render.lv=L.lvl;
  {const left=L.need-L.into,hot=L.into/L.need>=.75;$('xpNext').className='xpnext'+(hot?' hot':'');
-  $('xpNext').innerHTML=`${hot?'Almost there: ':''}<b>${left} XP</b> to LV ${L.lvl+1} · <span class="rw">+${bolts(LVREWARD(L.lvl+1))}</span>`}
+  $('xpNext').innerHTML=`${hot?'Almost there: ':''}<b>${left} XP</b> to LVL ${L.lvl+1} · <span class="rw">+${bolts(LVREWARD(L.lvl+1))}</span>`}
  $('rigSub').textContent=`${st.rig?RIGS[st.rig].name:'No rig yet'} · ${titleOf(c.miles)}`;
  setBar($('b-xp'),L.into/L.need*100);setVal($('v-xp'),xp,`${L.into} / ${L.need} XP`);
  for(const k of ['fuel','engine','susp','tires']){const g=$('g-'+k),v=Math.round(k==='stoke'?st.stoke:st.p[k]);
@@ -1086,7 +1129,7 @@ function render(full){
  $('gear').innerHTML=Array.from({length:4},(_,i)=>{const id=st.ups[i];return id?`<li title="${esc(UPS[id].good+'; '+UPS[id].bad)}">${UPS[id].name}</li>`:'<li class="empty">Empty slot</li>'}).join('');
  $('statDot').hidden=tab==='stats'||!CARDS.some(([k])=>st.seen[k]!==undefined?st.seen[k]!==c[k]:c[k]>0);
  renderJournal();
- if(full)renderPanel();
+ if(full){renderPanel();renderMap()}else moveTruck();
  if(st.trip&&$('tripbar')){const k=clamp((Date.now()-st.trip.start)/(st.trip.end-st.trip.start)*100),r=st.trip.route;
   setBar($('tripbar'),k);$('triptime').textContent=`Mile ${Math.floor(r.miles*k/100)} of ${r.miles} · ${fmt(st.trip.end-Date.now())} left`;
   if($('turn')&&Date.now()-st.trip.start>=15e3)$('turn').remove()}
