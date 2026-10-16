@@ -271,6 +271,106 @@ button{background:none;border:0;cursor:pointer}
 .press{color:var(--fa);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:18px}
 @media (hover:none){.press{display:none}}
 @media (prefers-reduced-motion:reduce){.startbtn{animation:none}}
+/* compact tiles so every tab fits without scrolling */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;min-width:0}
+.tile .th{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tile h3{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tile p{font-size:12px;color:var(--mu);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .th+p{margin-top:3px}
+.tile .con{color:var(--fa)}
+.desc span,.meta span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row>p.meta{color:var(--mu)}
+.tile.on{border-color:rgba(227,166,62,.45)}
+.tile.on h3{color:var(--ac)}
+.wtop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.wtop .sect{margin-top:0}
+.statline{font-size:12px;color:var(--mu);margin-top:6px}
+.statline+.statline{margin-top:0}
+.statline b{color:var(--tx);font-family:var(--mono);font-weight:500}
+.svc{display:grid;gap:8px}
+.svc .tile{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 6px 6px 12px}
+.tog.small{font-size:12px;margin-top:8px}
+.newtag{margin-left:6px;vertical-align:1px}
+.tog.small input{width:15px;height:15px}
+.mt .th span{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt b{font-family:var(--mono);font-weight:500;font-size:13px;white-space:nowrap}
+.mt .up{color:var(--ac);margin-right:6px}
+.mt .track{height:4px;margin:6px 0 4px}
+.mt small{display:block;font-size:11px;color:var(--fa);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 24px;font-size:13px}
+.rec li{display:flex;justify-content:space-between;gap:8px;min-width:0}
+.rec span{color:var(--mu);white-space:nowrap}
+.rec b{font-weight:500;font-family:var(--mono);white-space:nowrap}
+.rec b.word{font-family:var(--sans)}
+.region .track{height:5px;margin:7px 0 6px}
+.region .rw{margin-top:6px;color:var(--fa)}
+.region .rw.gold{color:var(--ac)}
+@media (max-width:599px){.grid2,.grid3,.wtop{grid-template-columns:minmax(0,1fr)}.rec{grid-template-columns:minmax(0,1fr)}}
+
+/* desktop: the whole game fits the window, no page scroll */
+@media (min-width:900px) and (min-height:620px){
+ html,body{height:100%}
+ body{overflow:hidden}
+ .app{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:14px 24px 16px;max-width:1280px}
+ .top{flex:none;margin-bottom:12px}
+ .righead{flex:none;margin-bottom:12px;padding:14px 18px;grid-template-columns:minmax(230px,1fr) minmax(0,1.25fr) minmax(0,1.15fr)!important;gap:22px}
+ .righead .gauges{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}
+ .righead .gearwrap{grid-column:auto;display:block;padding-top:0;border-top:0}
+ .righead .gearwrap .label{margin-bottom:6px;justify-content:space-between}
+ .righead .gear{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .righead .gear li{padding:5px 10px;font-size:12px}
+ .lvbadge{width:54px;height:54px;border-radius:14px}
+ .lvbadge b{font-size:24px}
+ .righead .xp{margin-top:10px}
+ .layout{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
+ .col{min-height:0}
+ .card{padding:16px 18px}
+ #camp{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+ #camp>.label{margin-bottom:10px}
+ .screen{padding:8px;margin-bottom:12px}
+ .screen canvas{height:clamp(90px,calc(100vh - 584px),260px);width:auto;max-width:100%;margin:0 auto}
+ .col{height:100%;overflow:hidden}
+ .primary{margin-top:12px;padding:10px 16px}
+ .journal{flex:1;min-height:0;overflow:hidden;margin-top:14px;padding-top:12px;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+ .board{height:100%;min-height:0;display:flex;flex-direction:column}
+ .tabs{flex:none;margin-bottom:10px}
+ #panel{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+ .sect{margin:16px 0 8px}
+ .map svg{height:clamp(150px,30vh,290px)!important}
+ .maphint{margin:8px 0 10px}
+ .sect{margin:12px 0 6px}
+ .tile{padding:6px 11px}
+ .tile p{line-height:1.3}
+ .tile .btn.sm{padding:3px 9px;font-size:12px}
+ .grid2,.grid3{gap:6px}
+ .list{gap:6px}
+ .row{padding:9px 12px}
+ .trip{padding:10px 12px}
+ .trip .track{margin:7px 0 6px}
+ .mt .track{margin:5px 0 3px}
+ .rec{gap:2px 24px}
+}
+/* shorter desktop windows: fold detail lines so every tab still fits */
+@media (min-width:900px) and (min-height:620px) and (max-height:860px){
+ .desc,.meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .desc span,.meta span{display:inline}
+ .desc .con::before,.meta span+span::before{content:" · "}
+ .mt small{display:none}
+ .map svg{height:clamp(130px,25vh,240px)!important}
+ .region p{line-height:1.25}
+ .righead{padding:12px 16px}
+ .top{margin-bottom:8px}
+ .sect{margin:9px 0 5px}
+ .tile{padding:5px 10px}
+ .seg button{padding:5px 0}
+ .tog.small{margin-top:5px}
+ .maphint{margin:6px 0 8px}
+ .tabs{margin-bottom:8px}
+ .tabs button{padding:6px 0}
+ .grid2,.grid3{gap:5px}
+}
 /* map tab */
 .map{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
 .map svg{display:block;width:100%;height:auto}
@@ -927,36 +1027,36 @@ function renderPanel(){
   const blocked=!st.rig||st.trip||st.pending||st.stranded;
   h+=sect('Posted trails')+'<ol class="list">'+st.routes.map((rt,i)=>{const L=LEN[rt.len],need=fuelNeed(rt),[fc,ft]=fit(rt),low=need>st.p.fuel;
    return`<li class="row"><h3>${pn(rt.name)}</h3><button class="btn go" data-go="${i}" ${blocked?'disabled':''}>Embark</button>
-   <p>${cap(rt.terrain)} · ${L.label} · ${DIFF[rt.diff]}</p><p>Needs ${need} fuel · <span class="fit-${low?'long':fc}">${low?'Short on fuel':ft}</span></p>${isNew(rt)?`<p class="newtrail"><span class="tag gain">Not on your map · +${bolts(DISC(rt.diff))}</span></p>`:''}</li>`}).join('')+'</ol>';
+   <p class="meta"><span>${cap(rt.terrain)} · ${L.label} · ${DIFF[rt.diff]}</span><span>Needs ${need} fuel · <span class="fit-${low?'long':fc}">${low?'Short on fuel':ft}</span>${isNew(rt)?` <span class="tag gain newtag">Not on your map · +${bolts(DISC(rt.diff))}</span>`:''}</span></p></li>`}).join('')+'</ol>';
   P.innerHTML=h;
   P.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>depart(+b.dataset.go));
   if($('turn'))$('turn').onclick=turnBack;
  }else if(tab==='map'){
   const found=Object.keys(MAPPT).reduce((a,t)=>a+NAMES[t].filter(n=>st.map.seen[n]).length,0);
-  let h=sect('Map',`${found} of 15 found`)+`<div class="map">${mapSVG()}</div><p class="maphint"><span>First run on a trail pays a discovery bonus.</span><span>Map a whole region for +${bolts(REGION_BONUS)}.</span></p>`;
-  h+='<ol class="list">'+Object.keys(MAPPT).map(t=>{const got=NAMES[t].filter(n=>st.map.seen[n]),done=!!st.map.regions[t];
-   return`<li class="region"><div class="rh"><h3>${REG[t]}</h3><span class="num">${got.length} of 5</span></div><span class="track"><i style="width:${got.length*20}%"></i></span>
-   <p class="chips">${got.map(n=>`<span class="tag">${esc(n)}</span>`).join('')}${'<span class="tag unk">?</span>'.repeat(5-got.length)}</p>
-   <p class="${done?'gold':''}">${done?`Fully mapped, +${bolts(REGION_BONUS)} claimed`:`Map all 5 for +${bolts(REGION_BONUS)}`}</p></li>`}).join('')+'</ol>';
+  let h=sect('Map',`${found} of 15 found`)+`<div class="map">${mapSVG()}</div><p class="maphint">First run on a trail pays a discovery bonus. A whole region pays +${bolts(REGION_BONUS)}.</p>`;
+  h+='<ol class="grid3">'+Object.keys(MAPPT).map(t=>{const got=NAMES[t].filter(n=>st.map.seen[n]),done=!!st.map.regions[t];
+   return`<li class="tile region"><div class="th"><h3>${REG[t]}</h3><span class="num">${got.length}/5</span></div><span class="track"><i style="width:${got.length*20}%"></i></span>
+   ${got.map(n=>`<p>${esc(n)}</p>`).join('')}${got.length<5?`<p class="con">${5-got.length} still in the fog</p>`:''}
+   <p class="rw ${done?'gold':''}">${done?`Mapped, +${bolts(REGION_BONUS)} claimed`:`Map all 5: +${bolts(REGION_BONUS)}`}</p></li>`}).join('')+'</ol>';
   P.innerHTML=h;
  }else if(tab==='stats'){
-  const c=st.car,row=(l,v,sub,d)=>`<dt>${l}</dt><dd${/^[A-Za-z]/.test(v)?' class="word"':''}>${d>0?`<span class="up">+${d}</span>`:''}${v}</dd>${sub?`<dd class="sub">${sub}</dd>`:''}`;
-  let h=sect('Milestones')+'<dl class="ledger">'+CARDS.map(([k,l])=>{const v=c[k],from=st.seen[k]??v,t=tierOf(k,v);
-   return row(l,v,`<span class="track"><i style="width:${pctOf(k,v)}%"></i></span>Tier ${t.tier} of ${MS[k].length}, ${t.next?'next at '+t.next:'maxed out'}`,v-from)}).join('')+'</dl>';
+  const c=st.car;
+  let h=sect('Milestones')+'<ol class="grid2">'+CARDS.map(([k,l])=>{const v=c[k],from=st.seen[k]??v,t=tierOf(k,v),d=v-from;
+   return`<li class="tile mt"><div class="th"><span>${l}</span><b>${d>0?`<span class="up">+${d}</span>`:''}${v}</b></div><span class="track"><i style="width:${pctOf(k,v)}%"></i></span><small>Tier ${t.tier} of ${MS[k].length} · ${t.next?'next at '+t.next:'maxed out'}</small></li>`}).join('')+'</ol>';
   CARDS.forEach(([k])=>st.seen[k]=c[k]);
   const pr=c.checks?Math.round(c.passed/c.checks*100):0,L=levelOf(xpOf(c));
-  h+=sect('Run record')+'<dl class="ledger">'+[['Rig level',L.lvl],['XP to next level',L.need-L.into],['Title',titleOf(c.miles)],['Check pass rate',pr+'%'],['Damage taken',c.dmg],['Fuel burned',c.fuel],
-   ['Times stranded',c.strands],['Trails found',`${Object.keys(st.map.seen).filter(n=>Object.values(NAMES).some(a=>a.includes(n))).length} of 15`],['Desert miles',c.terr.desert],['Mud miles',c.terr.mud],['Rock miles',c.terr.rock]].map(([l,v])=>row(l,v)).join('')+'</dl>';
+  h+=sect('Run record')+'<ul class="rec">'+[['Rig level',L.lvl],['XP to next level',L.need-L.into],['Title',titleOf(c.miles)],['Check pass rate',pr+'%'],['Damage taken',c.dmg],['Fuel burned',c.fuel],
+   ['Times stranded',c.strands],['Trails found',`${Object.keys(st.map.seen).filter(n=>Object.values(NAMES).some(a=>a.includes(n))).length} of 15`],['Desert miles',c.terr.desert],['Mud miles',c.terr.mud],['Rock miles',c.terr.rock],['Runs',c.runs]]
+   .map(([l,v])=>`<li><span>${l}</span><b${/^[A-Za-z]/.test(v)?' class="word"':''}>${v}</b></li>`).join('')+'</ul>';
   P.innerHTML=h;save();
  }else{
   const S=stats(),busy=st.trip||st.stranded,rc=Object.keys(PARTS).reduce((a,k)=>a+repCost(k),0),fc=fuelCost();
-  let h=sect('Rig')+`<div class="seg">${Object.entries(RIGS).map(([id,r])=>`<button data-swap="${id}" aria-pressed="${st.rig===id}" ${busy?'disabled':''}>${r.name}</button>`).join('')}</div>
-   <dl class="kv"><dt>Desert grip</dt><dd>${S.cap.desert}</dd><dt>Mud grip</dt><dd>${S.cap.mud}</dd><dt>Rock grip</dt><dd>${S.cap.rock}</dd><dt>Toughness</dt><dd>${S.rel}</dd><dt>Range</dt><dd>${S.range.toFixed(1)}</dd></dl>`;
-  h+=sect('Service')+`<ol class="list"><li class="row"><h3>Repair everything</h3><button class="btn go" id="repAll" ${rc<=0||busy?'disabled':''}>${rc>0?bolts(rc):'Done'}</button><p>All three parts back to 100.</p></li>
-   <li class="row"><h3>Fill the tank</h3><button class="btn go" id="fill" ${fc<=0||busy?'disabled':''}>${fc>0?bolts(fc):'Full'}</button><p>2 fuel for every bolt.</p></li></ol>`;
-  h+=sect('Gear',`${st.ups.length} of 4 slots`)+'<p class="hint">Pulling gear off gives no refund.</p><ol class="list">'+Object.entries(UPS).map(([id,u])=>{const on=st.ups.includes(id);
-   return`<li class="row${on?' on':''}"><h3>${u.name}</h3><button class="btn${on?'':' go'}" data-up="${id}" ${busy?'disabled':''}>${on?'Remove':u.cost+' bolts'}</button><p>${cap(u.good)}</p><p class="con">${cap(u.bad)}</p></li>`}).join('')+'</ol>';
-  h+=sect('Settings')+`<label class="tog"><input type="checkbox" id="fast" ${st.fast?'checked':''}>Fast timers for testing</label>`;
+  let h=`<div class="wtop"><div>${sect('Rig')}<div class="seg">${Object.entries(RIGS).map(([id,r])=>`<button data-swap="${id}" aria-pressed="${st.rig===id}" ${busy?'disabled':''}>${r.name}</button>`).join('')}</div>
+   <p class="statline">Grip: desert <b>${S.cap.desert}</b> · mud <b>${S.cap.mud}</b> · rock <b>${S.cap.rock}</b></p><p class="statline">Toughness <b>${S.rel}</b> · Range <b>${S.range.toFixed(1)}</b></p><label class="tog small"><input type="checkbox" id="fast" ${st.fast?'checked':''}>Fast timers for testing</label></div>
+   <div>${sect('Service')}<div class="svc"><div class="tile" title="Engine, suspension and tires back to 100"><h3>Repair everything</h3><button class="btn sm go" id="repAll" ${rc<=0||busy?'disabled':''}>${rc>0?bolts(rc):'Done'}</button></div>
+   <div class="tile" title="2 fuel for every bolt"><h3>Fill the tank</h3><button class="btn sm go" id="fill" ${fc<=0||busy?'disabled':''}>${fc>0?bolts(fc):'Full'}</button></div></div></div></div>`;
+  h+=sect('Gear',`${st.ups.length} of 4 slots · no refunds`)+'<ol class="grid2">'+Object.entries(UPS).map(([id,u])=>{const on=st.ups.includes(id);
+   return`<li class="tile${on?' on':''}"><div class="th"><h3>${u.name}</h3><button class="btn sm${on?'':' go'}" data-up="${id}" ${busy?'disabled':''}>${on?'Remove':u.cost+' bolts'}</button></div><p class="desc"><span>${cap(u.good)}</span><span class="con">${cap(u.bad)}</span></p></li>`}).join('')+'</ol>';
   P.innerHTML=h;
   P.querySelectorAll('[data-swap]').forEach(b=>b.onclick=()=>{if(st.rig===b.dataset.swap)return;st.rig=b.dataset.swap;burst();say(`Swapped to the ${RIGS[st.rig].name}.`);save();render(true)});
   P.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>toggleUp(b.dataset.up));
