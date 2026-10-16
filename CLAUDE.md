@@ -19,8 +19,9 @@ Off-road overlanding browser game for the Venture the Terrain brand. A truck "vi
 
 - Taps, revving, washing, radio check-ins and scrap grabs never change trail outcomes. Outcomes are decided when the rig departs.
 - "Grab scrap" buttons during a trail report are capped at 15% of a run's salvage and expire when the report finishes.
-- Keep effects calm: no confetti, cut-ins, chase lights, tickers or flying numbers. A changed number glows amber briefly (`setVal`), and anything that blinks stays under 3 flashes per second. The OS reduced-motion setting stops the truck's idle motion, the button pulse and fades.
-- Every amount shown must be a real value that changed. Salvage changes go in the journal's right-hand column, not in floating pop-ups.
+- The trail report has the juice (`juice()`): numbers fly off each line, salvage coins fly into the report's counter, finds and 3+ chains burst sparks, and damage gives a small shake. Failures get smaller effects than wins. Skip and the OS reduced-motion setting turn all of it off.
+- The main screen stays calm: no confetti, cut-ins, chase lights or tickers. A changed number glows amber briefly (`setVal`), and anything that blinks stays under 3 flashes per second.
+- Every amount shown, flying or not, must be a real value that changed. The report counter must land on the run's true salvage plus scrap.
 
 ## Look and feel
 

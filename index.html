@@ -161,6 +161,17 @@ button{background:none;border:0;cursor:pointer}
 .mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
 .mhead h2,.rtitle{font-size:20px;font-weight:700}
 .mhead p{color:var(--mu);font-size:13px}
+.rside{display:flex;align-items:center;gap:8px;flex:none}
+.rsalv{background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:13px;color:var(--mu);white-space:nowrap}
+.rsalv b{color:var(--ac);font-family:var(--mono);font-weight:500;margin-right:4px;display:inline-block}
+/* report juice: flying numbers, coins, sparks */
+.fly{position:fixed;z-index:50;pointer-events:none;font-weight:800;font-size:15px;white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.fly.salv{color:var(--ac);font-size:18px}
+.fly.dmg{color:#EE8D75;font-size:13px}
+.fly.fuel{color:var(--mu);font-size:13px}
+.fly.chain{color:#A3C2E8}
+.coin{position:fixed;z-index:50;pointer-events:none;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE3A0,#E3A63E 60%,#9A6A1A)}
+.spark{position:fixed;z-index:50;pointer-events:none;width:5px;height:5px;border-radius:1px;background:var(--ac)}
 .log li{display:grid;grid-template-columns:3.4em minmax(0,1fr);column-gap:12px;padding:10px 0;border-top:1px solid var(--line);animation:in .25s ease-out}
 .log li:first-child{border-top:0;padding-top:0}
 @keyframes in{from{opacity:0;transform:translateY(4px)}}
@@ -274,7 +285,7 @@ button{background:none;border:0;cursor:pointer}
 
 <div class="overlay" id="report" role="dialog" aria-modal="true" aria-labelledby="rTitle">
   <section class="modal">
-    <div class="mhead"><div><h2 class="pn" id="rTitle"></h2><p id="rMeta"></p></div><button class="btn sm" id="rSkip">Skip</button></div>
+    <div class="mhead"><div><h2 class="pn" id="rTitle"></h2><p id="rMeta"></p></div><div class="rside"><span class="rsalv"><b id="tSalv">0</b>salvage</span><button class="btn sm" id="rSkip">Skip</button></div></div>
     <ol class="log" id="rLog"></ol>
     <div class="result" id="result" hidden></div>
     <button class="primary" id="rDone" hidden><span class="pl">Triage the rig</span><span class="ps">Back to camp</span></button>
@@ -602,9 +613,47 @@ let RS=null;
 function scrap(S,box,v){
  const b=document.createElement('button');b.className='btn sm chip';b.textContent=`Grab scrap +${v}`;box.appendChild(b);S.scraps.push(b);
  b.onclick=()=>{if(RS!==S)return;const take=Math.min(v,S.bonusCap-S.bonus),s=document.createElement('span');
-  if(take>0){S.bonus+=take;s.className='got';s.textContent=`Grabbed +${take} scrap`;beep(1400,.04);beep(1900,.06,'square',.04,.05)}
+  if(take>0){S.bonus+=take;coins(S,b,take);s.className='got';s.textContent=`Grabbed +${take} scrap`;beep(1400,.04);beep(1900,.06,'square',.04,.05)}
   else{s.className='left';s.textContent='No room left in the bed'}
   b.replaceWith(s)};
+}
+/* ---------- report juice ---------- */
+const rectOf=el=>el.getBoundingClientRect();
+function fly(x,y,text,cls,spread=1){if(reduce)return;const e=document.createElement('span');e.className='fly '+cls;e.textContent=text;e.style.left=x+'px';e.style.top=y+'px';document.body.appendChild(e);
+ const dx=(Math.random()-.5)*90*spread,dy=-40-Math.random()*40*spread;
+ e.animate([{transform:'translate(-50%,0) scale(.7)',opacity:0},{transform:`translate(calc(-50% + ${dx*.4}px),${dy*.5}px) scale(1.15)`,opacity:1,offset:.25},{transform:`translate(calc(-50% + ${dx}px),${dy}px) scale(1)`,opacity:0}],{duration:1100,easing:'ease-out'}).onfinish=()=>e.remove()}
+function bumpCounter(){const b=$('tSalv');try{b.animate([{transform:'scale(1.35)',color:'#FFE3A0'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'})}catch(e){}}
+/* coins fly from a line to the report's salvage counter; each one adds its real share */
+function coins(S,from,n){
+ if(n<=0)return;const t=$('tSalv');
+ if(reduce||S.fast){S.salv+=n;t.textContent=S.salv;return}
+ const a=rectOf(from),b=rectOf(t),x0=a.left+Math.min(a.width,120)/2,y0=a.top+Math.min(a.height,40)/2,x1=b.left+b.width/2,y1=b.top+b.height/2;
+ const count=Math.min(12,Math.max(3,Math.ceil(n/4))),per=n/count;
+ for(let i=0;i<count;i++){const c=document.createElement('span');c.className='coin';c.style.left=x0-5+'px';c.style.top=y0-5+'px';document.body.appendChild(c);
+  const v=Math.round(per*(i+1))-Math.round(per*i),mx=(Math.random()-.5)*120,my=-30-Math.random()*60;
+  c.animate([{transform:'translate(0,0) scale(.5)'},{transform:`translate(${mx}px,${my}px) scale(1.2)`,offset:.35},{transform:`translate(${x1-x0}px,${y1-y0}px) scale(.6)`}],{duration:650+Math.random()*250,delay:i*45,easing:'ease-in',fill:'forwards'})
+   .onfinish=()=>{c.remove();if(RS!==S)return;S.salv=Math.min(S.salv+v,S.final??1e9);t.textContent=S.salv;bumpCounter();if(i%2===0)beep(1500+Math.random()*500,.03,'square',.02)}}
+}
+function sparks(el,n,col){if(reduce)return;const r=rectOf(el),x=r.left+12,y=r.top+10;
+ for(let i=0;i<n;i++){const s=document.createElement('span');s.className='spark';s.style.left=x+'px';s.style.top=y+'px';if(col)s.style.background=col;document.body.appendChild(s);
+  const a=Math.random()*Math.PI*2,d=30+Math.random()*60;
+  s.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) rotate(${Math.random()*360}deg)`,opacity:0}],{duration:600+Math.random()*300,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>s.remove()}}
+function shake(px){if(reduce)return;try{$('report').querySelector('.modal').animate([{transform:'translateX(0)'},{transform:`translateX(-${px}px)`},{transform:`translateX(${px}px)`},{transform:`translateX(-${px/2}px)`},{transform:'translateX(0)'}],{duration:260})}catch(e){}}
+/* every number here is a real value from the line; failures get smaller effects than wins */
+function juice(S,li,L,bits){
+ const r=rectOf(li.querySelector('.txt')),x=r.left+Math.min(r.width,260)/2,y=r.top;
+ let gain=0;
+ bits.forEach((t,i)=>{const m=t.match(/^\+(\d+) salvage/);if(m){gain+=+m[1];return}
+  if(S.fast)return;
+  if(/^(engine|suspension|tires) -/.test(t))setTimeout(()=>fly(x,y,t.toUpperCase(),'dmg',.6),i*120);
+  else if(/^fuel -/.test(t))setTimeout(()=>fly(x,y,t.toUpperCase(),'fuel',.5),i*120);
+  else if(/^chain/.test(t))fly(x+60,y,`x${t.split(' ')[1]}`,'chain',1.2)});
+ if(gain){if(!S.fast)fly(x,y,`+${gain}`,'salv',1);coins(S,li.querySelector('.txt'),gain)}
+ if(S.fast)return;
+ if(L.kind==='find')sparks(li,26);
+ else if(L.kind==='ok'&&/chain [3-9]|chain \d\d/.test(bits.join()))sparks(li,12);
+ else if(L.kind==='bad')shake(3);
+ else if(L.kind==='strand')shake(5);
 }
 const tagOf=t=>/^\+/.test(t)?'gain':/^(engine|suspension|tires) -|stranded/.test(t)?'dmg':/^chain/.test(t)?'chain':'';
 async function readReport(){
@@ -620,7 +669,8 @@ async function readReport(){
  $('rTitle').textContent=rt.name;$('rMeta').textContent=`${cap(rt.terrain)} · ${rt.label} · ${rt.miles} mi · ${DIFF[rt.diff]}`;
  const log=$('rLog'),res=$('result');log.innerHTML='';res.innerHTML='';res.hidden=true;$('rDone').hidden=true;$('rSkip').hidden=false;
  openOv('report');
- const S=RS={fast:false,bonus:0,bonusCap:Math.max(6,Math.round(rep.salvage*.15)),scraps:[],notes:[]};
+ $('tSalv').textContent='0';
+ const S=RS={fast:false,salv:0,bonus:0,bonusCap:Math.max(6,Math.round(rep.salvage*.15)),scraps:[],notes:[]};
  let chain=0;
  for(const L of rep.lines){
   const li=document.createElement('li');li.className='wait';li.innerHTML='<span class="mi"></span><div><p class="txt"></p></div>';
@@ -638,6 +688,7 @@ async function readReport(){
   if(bits.length){const p=document.createElement('p');p.className='fx';p.innerHTML=bits.map(x=>`<span class="tag ${tagOf(x)}">${esc(x)}</span>`).join('');box.appendChild(p)}
   if(!S.fast&&S.bonus<S.bonusCap&&(L.kind==='find'||(L.kind==='ok'&&Math.random()<.45)))scrap(S,box,L.kind==='find'?4+Math.floor(Math.random()*5):1+Math.floor(Math.random()*3));
   li.scrollIntoView({block:'nearest'});
+  juice(S,li,L,bits);
   if(L.kind==='find'){beep(660);beep(880,.08,'square',.05,.08);beep(1100,.12,'square',.05,.16)}
   else if(L.kind==='ok')beep(440*Math.pow(1.12,Math.min(chain,12)),.08);
   else if(L.kind==='bad')beep(140,.2,'sawtooth',.04);
@@ -648,6 +699,7 @@ async function readReport(){
  if(!S.fast)await wait(700);
  S.scraps.forEach(b=>{if(b.isConnected){const s=document.createElement('span');s.className='left';s.textContent='Left the scrap';b.replaceWith(s)}});
  if(S.bonus){st.salvage+=S.bonus;c.salv+=S.bonus}
+ await wait(S.fast||reduce?0:500);S.final=S.salv=RSt.salv+S.bonus;$('tSalv').textContent=S.salv;
  const rank=RSt.rank,x0=xpOf(carBefore),x1=xpOf(c),L0=levelOf(x0),L1=levelOf(x1),earned=RSt.salv+S.bonus;
  save();
  res.innerHTML=`<div class="rank ${rank}"><b>${rank}</b><div><span>${RANKS[rank]}</span><small>+${earned} salvage, +${x1-x0} xp</small></div></div><dl class="ledger" id="tally"></dl><div class="career" id="careerOut"></div>`;res.hidden=false;
