@@ -30,11 +30,11 @@ Off-road overlanding browser game for the Venture the Terrain brand. A truck "vi
 ## Look and feel
 
 - Simple, halfway between a modern app and a text game: flat dark rounded cards and real buttons, with the content told in short plain sentences. Inter for text, IBM Plex Mono only for numbers, mile markers and check rolls.
-- Palette: charcoal/brown neutrals; amber for the main button, bolts and wins; rust for damage and low gauges; green for passed checks and good fits; blue for XP; colored gauge bars (fuel gold, engine red, suspension blue, tires olive, stoke khaki).
+- Palette: charcoal/brown neutrals; amber for the main button, bolts and wins; rust for damage and low gauges; green for passed checks and good fits; blue for XP; colored gauge bars (fuel gold, engine red, suspension blue, tires olive).
 - Camp card: the pixel truck (calm, no particles beyond mud and installs), then the status as one short fact per line, the one obvious next move, pet actions (rev, wash), and the journal of the last 5 events.
 - The trail report reads out line by line: one sentence per line (balanced if it wraps), a mono check line, then small effect tags. Hyphenated words and trail names never split across lines (`.pn`).
 - Journal entries are one short sentence that fits on one line at 375px, with any bolt change in its own column. Keep trail names out of journal entries.
-- The rig sheet is a full-width header card at the top (`.righead`): name, level and XP beside five compact gauges from 900px, gauges on their own row from 600px, and the gear slots in a row below. Phones get the stacked list version.
+- The rig sheet is a full-width header card at the top (`.righead`): name, level and XP beside four compact gauges from 900px, gauges on their own row from 600px, and the gear slots in a row below. Phones get the stacked list version.
 - Below it, desktop is two columns (Camp on the left, the trail board on the right), stacking to one column under 900px. From 600px to 899px the truck sits beside the camp status. Check 375px, 768px and 1280px for wraps and horizontal overflow after layout or copy changes.
 - Do not reproduce real vehicle designs (the pickup sprite is an original design) or real brands.
 - Never use em dashes in UI copy.

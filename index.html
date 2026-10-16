@@ -119,7 +119,7 @@ button{background:none;border:0;cursor:pointer}
 .gauge{display:grid;grid-template-columns:6.8em minmax(0,1fr) 2.6em;align-items:center;gap:12px;font-size:13px}
 .gauge>span:first-child{color:var(--mu)}
 .gauge .v{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
-#g-fuel i{background:var(--fuel)}#g-engine i{background:var(--engine)}#g-susp i{background:var(--susp)}#g-tires i{background:var(--tires)}#g-stoke i{background:var(--stoke)}
+#g-fuel i{background:var(--fuel)}#g-engine i{background:var(--engine)}#g-susp i{background:var(--susp)}#g-tires i{background:var(--tires)}
 .gauge.low .track i{background:var(--red)!important}
 .gauge.low .v{color:var(--red)}
 .gearwrap{margin-top:22px}
@@ -131,7 +131,7 @@ button{background:none;border:0;cursor:pointer}
 .righead{margin-bottom:18px}
 @media (min-width:600px){
  .righead{display:grid;grid-template-columns:minmax(0,1fr);gap:18px 28px;align-items:center}
- .righead .gauges{margin-top:0;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 16px}
+ .righead .gauges{margin-top:0;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 16px}
  .righead .gauge{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l v" "t t";gap:5px 6px;font-size:12px}
  .righead .gauge>span:first-child{grid-area:l;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .righead .gauge .v{grid-area:v}
@@ -335,7 +335,6 @@ button{background:none;border:0;cursor:pointer}
       <div class="gauge" id="g-engine"><span>Engine</span><span class="track"><i></i></span><span class="v"></span></div>
       <div class="gauge" id="g-susp"><span>Suspension</span><span class="track"><i></i></span><span class="v"></span></div>
       <div class="gauge" id="g-tires"><span>Tires</span><span class="track"><i></i></span><span class="v"></span></div>
-      <div class="gauge" id="g-stoke"><span>Stoke</span><span class="track"><i></i></span><span class="v"></span></div>
     </div>
     <div class="gearwrap"><h3 class="label"><span>Gear</span><span id="gearCount"></span></h3><ul class="gear" id="gear"></ul></div>
   </section>
@@ -981,7 +980,7 @@ function render(full){
   $('xpNext').innerHTML=`${hot?'Almost there: ':''}<b>${left} XP</b> to LV ${L.lvl+1} · <span class="rw">+${bolts(LVREWARD(L.lvl+1))}</span>`}
  $('rigSub').textContent=`${st.rig?RIGS[st.rig].name:'No rig yet'} · ${titleOf(c.miles)}`;
  setBar($('b-xp'),L.into/L.need*100);setVal($('v-xp'),xp,`${L.into} / ${L.need} XP`);
- for(const k of ['fuel','engine','susp','tires','stoke']){const g=$('g-'+k),v=Math.round(k==='stoke'?st.stoke:st.p[k]);
+ for(const k of ['fuel','engine','susp','tires']){const g=$('g-'+k),v=Math.round(k==='stoke'?st.stoke:st.p[k]);
   g.classList.toggle('low',k!=='stoke'&&v<30);setBar(g,v);setVal(g.querySelector('.v'),v)}
  $('gearCount').textContent=`${st.ups.length} of 4`;
  $('gear').innerHTML=Array.from({length:4},(_,i)=>{const id=st.ups[i];return id?`<li title="${esc(UPS[id].good+'; '+UPS[id].bad)}">${UPS[id].name}</li>`:'<li class="empty">Empty slot</li>'}).join('');
