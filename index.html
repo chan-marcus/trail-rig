@@ -89,6 +89,7 @@ button{background:none;border:0;cursor:pointer}
 .journal .d{font-family:var(--mono);font-size:13px;color:var(--fa);white-space:nowrap}
 .journal .d.plus{color:var(--ac)}
 .journal .empty{color:var(--fa)}
+.j2{display:none}
 
 /* rig sheet */
 .ident{display:flex;align-items:center;gap:12px}
@@ -354,9 +355,6 @@ button{background:none;border:0;cursor:pointer}
 }
 /* shorter desktop windows: fold detail lines so every tab still fits */
 @media (min-width:900px) and (min-height:620px) and (max-height:860px){
- .desc,.meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .desc span,.meta span{display:inline}
- .desc .con::before,.meta span+span::before{content:" · "}
  .mt small{display:none}
  .map svg{height:clamp(130px,25vh,240px)!important}
  .region p{line-height:1.25}
@@ -382,21 +380,29 @@ button{background:none;border:0;cursor:pointer}
 .col{display:flex;flex-direction:column;gap:18px}
 @media (max-width:899px){#camp{order:-1}}
 @media (min-width:900px) and (min-height:620px){
- #mapcard{flex:1 1 0;min-height:150px;display:flex;flex-direction:column}
+ #camp{order:-1;flex:1.6 1 0;min-height:0;height:auto!important;display:flex;flex-direction:column}
+ #mapcard{flex:1 1 0;min-height:140px;display:flex;flex-direction:column}
  #mapcard .map{flex:1;min-height:0;display:flex}
  #mapcard .map svg{height:100%!important;width:100%}
- #camp{flex:none;height:auto!important}
- #camp .campgrid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:14px;align-items:center}
- #camp .screen{margin-bottom:0}
- #camp .screen canvas{height:auto!important;width:100%!important}
- #camp .journal{flex:none;max-height:92px;margin-top:10px;padding-top:10px}
- #camp>.label{display:none}
- #camp .primary{margin-top:8px;padding:8px 14px}
- #camp .radio{margin-top:8px;padding:6px 8px 6px 12px}
- #camp .pet{margin-top:8px}
- #camp .status p:first-child{font-size:15px}
  #mapcard>.label{margin-bottom:8px}
  #mapcard .mapcap{margin-top:6px}
+ #camp>.label{display:none}
+ #camp .campgrid{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+ #camp .screen{flex:1;min-height:120px;margin-bottom:0;position:relative}
+ #camp .screen canvas{position:absolute;left:8px;top:8px;width:calc(100% - 16px)!important;height:calc(100% - 16px)!important;max-width:none;object-fit:contain;aspect-ratio:auto}
+ #camp .campinfo{flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"s p" "r p" "e p";column-gap:16px;align-items:center}
+ #camp .status{grid-area:s}
+ #camp .radio{grid-area:r;margin-top:8px;padding:6px 8px 6px 12px}
+ #camp .primary{grid-area:p;margin:0;padding:10px 14px}
+ #camp .pet{grid-area:e;margin-top:8px}
+ #camp .status p:first-child{font-size:16px}
+ #camp .journal{display:none}
+ .desc,.meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .desc span,.meta span{display:inline}
+ .desc .con::before,.meta span+span::before{content:" · "}
+ #panel{display:flex;flex-direction:column}
+ #panel>*{flex:none}
+ #panel>.j2{display:block!important;flex:1 1 0;min-height:0;overflow:hidden;margin-top:14px;padding-top:10px;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
  .col{gap:12px}
 }
 /* map tab */
@@ -477,7 +483,7 @@ button{background:none;border:0;cursor:pointer}
         <h2 class="label">Camp</h2>
         <div class="campgrid">
           <div class="screen"><canvas id="c" width="96" height="56" aria-label="Your rig. Tap to rev the engine."></canvas></div>
-          <div>
+          <div class="campinfo">
             <div class="status" id="status"></div>
             <div class="radio" id="radio" hidden></div>
             <button class="primary" id="primary"><span class="pl" id="pl"></span><span class="ps" id="ps"></span></button>
@@ -772,9 +778,11 @@ function say(m,d){
  if(d===undefined&&last&&last.m===m&&last.d===undefined)last.n=(last.n||1)+1;else st.log.push(d===undefined?{m,n:1}:{m,d,n:1});
  if(st.log.length>40)st.log.splice(0,st.log.length-40);
  renderJournal();
- const r=$('journal').getBoundingClientRect();if(r.bottom<0||r.top>innerHeight-40)toast(d===undefined?m:`${m} ${d>0?'+':''}${bolts(d)}.`);
+ const jv=[$('journal'),$('journal2')].find(j=>j&&j.offsetParent),r=jv&&jv.getBoundingClientRect();if(!jv||r.bottom<0||r.top>innerHeight-40)toast(d===undefined?m:`${m} ${d>0?'+':''}${bolts(d)}.`);
 }
+renderJournal.html=L=>L.length?L.map(e=>{const d=e.d!==undefined?`<span class="d ${e.d>0?'plus':''}">${e.d>0?'+':''}${e.d}</span>`:e.n>1?`<span class="d">x${e.n}</span>`:'<span></span>';return`<li><span class="m">${esc(e.m)}</span>${d}</li>`}).join(''):'<li><span class="m empty">Nothing yet.</span><span></span></li>';
 function renderJournal(){const L=(st.log||[]).slice(-5).reverse();
+ const j2=$('journal2');if(j2)j2.innerHTML=renderJournal.html(L);
  $('journal').innerHTML=L.length?L.map(e=>{const d=e.d!==undefined?`<span class="d ${e.d>0?'plus':''}">${e.d>0?'+':''}${e.d}</span>`:e.n>1?`<span class="d">x${e.n}</span>`:'<span></span>';
   return`<li><span class="m">${esc(e.m)}</span>${d}</li>`}).join(''):'<li><span class="m empty">Nothing yet.</span><span></span></li>'}
 function openOv(id){const o=$(id);o.classList.add('show');o.scrollTop=0;document.body.classList.add('lock')}
@@ -1080,6 +1088,7 @@ function renderPanel(){
    return`<li class="row"><h3>${pn(rt.name)}</h3><button class="btn go" data-go="${i}" ${blocked?'disabled':''}>Embark</button>
    <p class="meta"><span>${cap(rt.terrain)} · ${L.label} · ${DIFF[rt.diff]}</span><span>Needs ${need} fuel · <span class="fit-${low?'long':fc}">${low?'Short on fuel':ft}</span>${isNew(rt)?` <span class="tag gain newtag">Not on your map · +${bolts(DISC(rt.diff))}</span>`:''}</span></p></li>`}).join('')+'</ol>';
   P.innerHTML=h;
+  P.insertAdjacentHTML('beforeend','<div class="journal j2"><h3 class="label">Journal</h3><ol id="journal2"></ol></div>');renderJournal();
   P.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>depart(+b.dataset.go));
   if($('turn'))$('turn').onclick=turnBack;
  }else if(tab==='stats'){
